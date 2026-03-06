@@ -1,4 +1,20 @@
-.claude/settings.local.json
+# Claude Code — configuração local (não vai pro GitHub)
+.claude/
+
+# Imagens locais
 *.png
+
+# Pastas de trabalho locais
 CRIATIVOS/
+design-system/
+store-lp/
+
+# Scripts Python utilitários
+*.py
+
+# Scripts PowerShell locais
+*.ps1
+
+# Cache Python
 __pycache__/
+*.pyc
