@@ -1,3 +1,4 @@
 .claude/settings.local.json
 *.png
 CRIATIVOS/
+__pycache__/
