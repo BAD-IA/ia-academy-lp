@@ -104,36 +104,103 @@
       font-size: .85rem; font-weight: 600;
       letter-spacing: .08em; text-transform: uppercase;
       padding: 16px 36px;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: all .22s ease;
+      transition: transform .22s ease, box-shadow .22s ease, background .22s ease, color .22s ease, border-color .22s ease;
       border: none;
+      position: relative;
+      overflow: hidden;
     }
+    /* Shimmer sweep no hover */
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+      transition: left .5s ease;
+      pointer-events: none;
+    }
+    .btn:hover::before { left: 140%; }
+
     .btn-primary {
-      background: linear-gradient(135deg, #a855f7, #7c3aed);
+      background: linear-gradient(135deg, #b975f9 0%, #a855f7 40%, #7c3aed 100%);
       color: #fff;
+      box-shadow: 0 0 24px rgba(168,85,247,.35), 0 4px 16px rgba(0,0,0,.3);
       animation: pulse-glow 3s ease-in-out infinite;
     }
-    .btn-primary:hover { background: linear-gradient(135deg, #c084fc, #a855f7); transform: translateY(-2px); }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #c084fc 0%, #b060fa 40%, #9333ea 100%);
+      box-shadow: 0 0 40px rgba(168,85,247,.6), 0 8px 24px rgba(0,0,0,.35);
+      transform: translateY(-2px) scale(1.02);
+    }
+
     .btn-outline {
       background: transparent;
       color: var(--white);
-      border: 1px solid rgba(168,85,247,.4);
+      border: 1px solid rgba(168,85,247,.45);
+      z-index: 0;
     }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 20px rgba(168,85,247,.2); }
+    /* Fill left→right no hover */
+    .btn-outline::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #a855f7, #7c3aed);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .3s ease;
+      z-index: -1;
+      border-radius: 6px;
+    }
+    .btn-outline:hover {
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 0 28px rgba(168,85,247,.4);
+    }
+    .btn-outline:hover::after { transform: scaleX(1); }
+    /* Garante shimmer no topo do fill */
+    .btn-outline .btn-outline::before { z-index: 1; }
+
     .btn-lg { padding: 20px 48px; font-size: .9rem; }
-    .btn-arrow::after { content: '→'; font-size: 1rem; }
+    .btn-arrow .arrow-icon {
+      display: inline-block;
+      transition: transform .22s ease;
+      font-style: normal;
+    }
+    .btn-arrow:hover .arrow-icon { transform: translateX(5px); }
 
     /* ─── BADGE ─── */
+    @keyframes pulse-dot {
+      0%,100% { box-shadow: 0 0 0 0 rgba(168,85,247,.6); }
+      50%      { box-shadow: 0 0 0 4px rgba(168,85,247,0); }
+    }
     .badge {
-      display: inline-block;
+      display: inline-flex; align-items: center; gap: 8px;
       font-size: .7rem; font-weight: 600;
       letter-spacing: .12em; text-transform: uppercase;
       color: var(--accent);
       border: 1px solid rgba(168,85,247,.4);
-      padding: 5px 14px; border-radius: 2px;
+      padding: 5px 14px 5px 10px; border-radius: 20px;
       margin-bottom: 24px;
       background: rgba(168,85,247,.08);
+    }
+    .badge::before {
+      content: '';
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      flex-shrink: 0;
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    /* ─── SCROLL REVEAL ─── */
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .reveal { opacity: 0; }
+    .reveal.revealed {
+      animation: fade-up .6s ease forwards;
     }
 
     /* ─── HERO ─── */
@@ -346,11 +413,25 @@
       font-family: 'Inter', sans-serif;
       font-size: .85rem; font-weight: 600;
       letter-spacing: .08em; text-transform: uppercase;
-      padding: 18px 44px; border-radius: 4px;
-      transition: all .22s;
-      display: inline-block;
+      padding: 18px 44px; border-radius: 6px;
+      transition: background .22s ease, transform .22s ease, box-shadow .22s ease;
+      display: inline-flex; align-items: center; gap: 8px;
+      position: relative; overflow: hidden;
+      cursor: pointer;
     }
-    .cta-band .btn-dark:hover { background: #1a1a1a; transform: translateY(-2px); }
+    .cta-band .btn-dark::before {
+      content: '';
+      position: absolute; top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.12), transparent);
+      transition: left .5s ease;
+    }
+    .cta-band .btn-dark:hover::before { left: 140%; }
+    .cta-band .btn-dark:hover {
+      background: #1c1c1c;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    }
     .cta-band small { display: block; margin-top: 14px; font-size: .75rem; color: rgba(10,10,10,.55); }
 
     /* ─── MÓDULOS ─── */
@@ -456,12 +537,17 @@
       gap: 1px;
       background: var(--line);
       border: 1px solid var(--line);
-      border-radius: 4px;
+      border-radius: 6px;
       overflow: hidden;
     }
     .testi-card {
       background: var(--surface);
       padding: 36px 32px;
+      transition: background .25s ease, box-shadow .25s ease;
+    }
+    .testi-card:hover {
+      background: #1e1235;
+      box-shadow: inset 0 0 0 1px rgba(168,85,247,.3), 0 0 32px rgba(168,85,247,.08);
     }
     .testi-stars { color: var(--accent); font-size: .85rem; letter-spacing: 2px; margin-bottom: 20px; }
     .testi-text {
@@ -672,7 +758,7 @@
       <a href="https://pay.cakto.com.br/vtw4ozj_670334?affiliate=PVVe4qnj"
          class="btn btn-primary btn-lg btn-arrow"
          onclick="fbq('track','InitiateCheckout')">
-        Adquirir agora
+        Adquirir agora <span class="arrow-icon">→</span>
       </a>
       <a href="#sobre" class="btn btn-outline">Ver o que aprendo</a>
     </div>
@@ -825,7 +911,7 @@
       <a href="https://pay.cakto.com.br/vtw4ozj_670334?affiliate=PVVe4qnj"
          class="btn btn-primary btn-lg btn-arrow"
          onclick="fbq('track','InitiateCheckout')">
-        Adquirir acesso completo
+        Adquirir acesso completo <span class="arrow-icon">→</span>
       </a>
     </div>
   </div>
@@ -850,7 +936,7 @@
         <a href="https://pay.cakto.com.br/vtw4ozj_670334?affiliate=PVVe4qnj"
            class="btn btn-primary btn-arrow"
            onclick="fbq('track','InitiateCheckout')">
-          Adquirir agora
+          Adquirir agora <span class="arrow-icon">→</span>
         </a>
       </div>
     </div>
@@ -941,7 +1027,7 @@
       <a href="https://pay.cakto.com.br/vtw4ozj_670334?affiliate=PVVe4qnj"
          class="btn btn-primary btn-lg btn-arrow"
          onclick="fbq('track','InitiateCheckout')">
-        Adquirir o IA Academy
+        Adquirir o IA Academy <span class="arrow-icon">→</span>
       </a>
     </div>
   </div>
@@ -1015,7 +1101,7 @@
       <a href="https://pay.cakto.com.br/vtw4ozj_670334?affiliate=PVVe4qnj"
          class="btn btn-primary btn-lg btn-arrow"
          onclick="fbq('track','InitiateCheckout')">
-        Adquirir agora com desconto
+        Adquirir agora com desconto <span class="arrow-icon">→</span>
       </a>
       <div class="trust-row">
         <span class="trust-item">Pagamento seguro</span>
@@ -1046,7 +1132,7 @@
   <a href="https://pay.cakto.com.br/vtw4ozj_670334?affiliate=PVVe4qnj"
      class="btn btn-primary btn-arrow"
      onclick="fbq('track','InitiateCheckout')">
-    Adquirir agora — 12x de R$24,75
+    Adquirir agora — 12x de R$24,75 <span class="arrow-icon">→</span>
   </a>
 </div>
 
@@ -1100,6 +1186,18 @@
       });
     }, {threshold: 0.5});
     targets.forEach(function(t){ observer.observe(t.el); });
+  })();
+
+  /* ── SCROLL REVEAL ── */
+  (function(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var els = document.querySelectorAll('.stats-bar, .manifesto, .modules-section, .split, .gallery-section, .testimonials-section, .guarantee-section, .faq-section');
+    var obs = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('revealed'); obs.unobserve(e.target); }
+      });
+    }, {threshold: 0.08});
+    els.forEach(function(el){ el.classList.add('reveal'); obs.observe(el); });
   })();
 
   /* ── PARTICLES ── */
