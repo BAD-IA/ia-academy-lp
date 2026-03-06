@@ -378,6 +378,8 @@
     }
     .module-row:nth-child(odd) { padding-right: 48px; border-right: 1px solid var(--line); }
     .module-row:nth-child(even) { padding-left: 48px; }
+    .module-row { transition: background .2s ease; cursor: default; }
+    .module-row:hover { background: rgba(168,85,247,.04); }
     .module-n {
       font-family: 'Playfair Display', serif;
       font-size: 2rem; color: var(--line);
@@ -585,6 +587,15 @@
     .footer-links a:hover { color: var(--white); }
     .footer-disc { font-size: .73rem; color: var(--muted); margin-top: 20px; line-height: 1.6; opacity: .7; }
 
+    /* ─── PREFERS-REDUCED-MOTION ─── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
     /* ─── STICKY MOBILE ─── */
     .sticky-mobile {
       display: none;
@@ -624,6 +635,15 @@
   </style>
 </head>
 <body>
+
+<!-- SVG defs reutilizáveis -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <defs>
+    <symbol id="star" viewBox="0 0 16 16" width="16" height="16">
+      <path d="M8 1l1.854 3.756L14 5.528l-3 2.924.708 4.131L8 10.5l-3.708 2.083L5 8.452 2 5.528l4.146-.772L8 1z" fill="#a855f7"/>
+    </symbol>
+  </defs>
+</svg>
 
 <!-- ═══════════════════════════════ HERO ═══ -->
 <section class="hero">
@@ -884,7 +904,7 @@
     </div>
     <div class="testi-grid">
       <div class="testi-card">
-        <div class="testi-stars">★★★★★</div>
+        <div class="testi-stars"><svg width="88" height="16" viewBox="0 0 88 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="5 estrelas"><use href="#star" x="0"/><use href="#star" x="18"/><use href="#star" x="36"/><use href="#star" x="54"/><use href="#star" x="72"/></svg></div>
         <p class="testi-text">"Em 2 semanas já estava usando IA para criar conteúdo para clientes e cobrando o dobro. O investimento se pagou no primeiro trabalho."</p>
         <div class="testi-author">
           <div class="testi-av">RL</div>
@@ -895,7 +915,7 @@
         </div>
       </div>
       <div class="testi-card">
-        <div class="testi-stars">★★★★★</div>
+        <div class="testi-stars"><svg width="88" height="16" viewBox="0 0 88 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="5 estrelas"><use href="#star" x="0"/><use href="#star" x="18"/><use href="#star" x="36"/><use href="#star" x="54"/><use href="#star" x="72"/></svg></div>
         <p class="testi-text">"Não sabia nada de tecnologia. Hoje automatizo minha agenda, crio posts e escrevo e-mails com IA. Economizo 3 horas por dia."</p>
         <div class="testi-author">
           <div class="testi-av">CA</div>
@@ -906,7 +926,7 @@
         </div>
       </div>
       <div class="testi-card">
-        <div class="testi-stars">★★★★★</div>
+        <div class="testi-stars"><svg width="88" height="16" viewBox="0 0 88 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="5 estrelas"><use href="#star" x="0"/><use href="#star" x="18"/><use href="#star" x="36"/><use href="#star" x="54"/><use href="#star" x="72"/></svg></div>
         <p class="testi-text">"Comecei a oferecer serviços de IA para empresas locais. Fechei 4 clientes no primeiro mês. O IA Academy mudou minha visão."</p>
         <div class="testi-author">
           <div class="testi-av">MB</div>
@@ -989,7 +1009,6 @@
         <div class="cd-box"><div class="cd-n" id="cd-s">00</div><div class="cd-l">seg</div></div>
       </div>
       <div class="price-row">
-        
         <span class="price-new">12x de R$24,75</span>
         <span class="price-inst">sem juros</span>
       </div>
@@ -1045,6 +1064,42 @@
       document.getElementById('cd-s').textContent=String(s).padStart(2,'0');
     }
     tick(); setInterval(tick,1000);
+  })();
+
+  /* ── STATS COUNT-UP ── */
+  (function(){
+    var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+    var nums = document.querySelectorAll('.stat-num');
+    var targets = [];
+    nums.forEach(function(el){
+      var raw = el.textContent.trim();
+      var suffix = raw.replace(/[\d.,]/g,'');
+      var value = parseFloat(raw.replace(/[^\d.]/g,''));
+      if(!isNaN(value)) targets.push({el:el, end:value, suffix:suffix, raw:raw});
+    });
+    if(!targets.length) return;
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(!entry.isIntersecting) return;
+        observer.unobserve(entry.target);
+        var t = targets.find(function(x){ return x.el === entry.target; });
+        if(!t) return;
+        var start = 0, duration = 1400, startTime = null;
+        function step(ts){
+          if(!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / duration, 1);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          var current = eased * t.end;
+          var formatted = t.end % 1 !== 0 ? current.toFixed(1) : Math.floor(current).toLocaleString('pt-BR');
+          t.el.textContent = formatted + t.suffix;
+          if(progress < 1) requestAnimationFrame(step);
+          else t.el.textContent = t.raw;
+        }
+        requestAnimationFrame(step);
+      });
+    }, {threshold: 0.5});
+    targets.forEach(function(t){ observer.observe(t.el); });
   })();
 
   /* ── PARTICLES ── */
