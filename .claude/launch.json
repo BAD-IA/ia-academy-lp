@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ia-academy-lp",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": ["-ExecutionPolicy", "Bypass", "-File", "serve.ps1"],
+      "port": 5000,
+      "autoPort": false
+    },
+    {
+      "name": "store-lp",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "5001", "--directory", "store-lp"],
+      "port": 5001,
+      "autoPort": false
+    }
+  ]
+}
